@@ -42,23 +42,22 @@ const mensagensDeErro = {
         customError: 'O CPF digitado não é válido.' 
     },
     cep: {
-        valueMissing: 'O campo do CEP não pode estar vazio.',
+        valueMissing: 'O campo de CEP não pode estar vazio.',
         patternMismatch: 'O CEP digitado não é válido.',
-        customError: 'Não foi possível buascar o CEP'
-    }, 
+        customError: 'Não foi possível buscar o CEP.'
+    },
     logradouro: {
-        valueMissing: 'O campo Logradouro não pode estar vazio'
+        valueMissing: 'O campo de logradouro não pode estar vazio.'
     },
     cidade: {
-        valueMissing: 'O campo Cidade não pode estar vazio'
+        valueMissing: 'O campo de cidade não pode estar vazio.'
     },
     estado: {
-        valueMissing: 'O campo Estado não pode estar vazio'
+        valueMissing: 'O campo de estado não pode estar vazio.'
     },
     preco: {
         valueMissing: 'O campo de preço não pode estar vazio.'
     }
-
 }
 
 const validadores = {
@@ -163,33 +162,34 @@ function confirmaDigito(soma) {
 }
 
 function recuperarCEP(input) {
-
     const cep = input.value.replace(/\D/g, '')
-
-    const url = `https://viacep.com.br/ws/${cep}/json`
+    const url = `https://viacep.com.br/ws/${cep}/json/`
     const options = {
         method: 'GET',
         mode: 'cors',
-        headers: {'content-type': 'aplications/json;charset=utf-8'}
+        headers: {
+            'content-type': 'application/json;charset=utf-8'
+        }
     }
 
     if(!input.validity.patternMismatch && !input.validity.valueMissing) {
-        fetch(url,options).then(response => response.json()
+        fetch(url,options).then(
+            response => response.json()
         ).then(
             data => {
                 if(data.erro) {
-                input.setCustomValidity('Não foi possível buascar o CEP')
+                    input.setCustomValidity('Não foi possível buscar o CEP.')
+                    return
+                }
+                input.setCustomValidity('')
+                preencheCamposComCEP(data)
                 return
             }
-            input.setCustomValidity('')
-            preencheCampoComCEP (data)
-            return
-        }
         )
-    } 
+    }
 }
 
-function preencheCampoComCEP(data){
+function preencheCamposComCEP(data) {
     const logradouro = document.querySelector('[data-tipo="logradouro"]')
     const cidade = document.querySelector('[data-tipo="cidade"]')
     const estado = document.querySelector('[data-tipo="estado"]')
@@ -198,4 +198,3 @@ function preencheCampoComCEP(data){
     cidade.value = data.localidade
     estado.value = data.uf
 }
-
